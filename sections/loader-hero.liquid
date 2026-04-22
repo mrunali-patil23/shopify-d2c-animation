@@ -1,0 +1,133 @@
+<div id="loader">
+  <svg id="logo" viewBox="0 0 1000 200">
+    <text x="50%" y="50%">BRAND</text>
+  </svg>
+</div>
+
+<section class="hero">
+  <h1 class="hero-title">Power Your Day</h1>
+  <img src="https://dummyimage.com/200x400/000/ffffff&text=Img" class="hero-image">
+</section>
+
+<style>
+#loader {
+  position: fixed;
+  inset: 0;
+  background: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+/* SVG sizing */
+#logo {
+  width: 70%;
+  max-width: 800px;
+}
+
+/* Text initial state: outline only */
+#logo text {
+  font-size: 140px;
+  font-weight: 700;
+
+  fill: #00ffcc;              /* will be revealed via clip-path */
+  stroke: white;
+  stroke-width: 2;
+
+  /* stroke draw setup */
+  stroke-dasharray: 1200;
+  stroke-dashoffset: 1200;
+
+  /* directional fill (bottom → top) */
+  clip-path: inset(100% 0% 0% 0%);
+
+  dominant-baseline: middle;
+  text-anchor: middle;
+}
+
+/* Hero (already visible under loader) */
+.hero {
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-title {
+  font-size: 64px;
+  font-weight: 600;
+  max-width: 600px;
+  line-height: 1.1;
+}
+
+.hero-image {
+  position: absolute;
+  right: -100%;              /* waits off-screen */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 300px;
+  height: 500px
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const loader = document.getElementById("loader");
+
+  // --- 1) Stroke draw ---
+  if (typeof gsap !== "undefined") {
+    gsap.fromTo("#logo text",
+      { strokeDashoffset: 1200 },
+      {
+        strokeDashoffset: 0,
+        duration: 2,
+        ease: "power2.out"
+      }
+    );
+
+    // --- 2) Directional fill (bottom → top) ---
+    gsap.to("#logo text", {
+      clipPath: "inset(0% 0% 0% 0%)",
+      duration: 1,
+      delay: 2,
+      ease: "power2.out"
+    });
+  }
+
+  // --- 3) Exit loader (2.5–4s total) ---
+  setTimeout(() => {
+    loader.style.opacity = "0";
+    loader.style.transition = "opacity 0.8s ease";
+
+    setTimeout(() => {
+      loader.style.display = "none";
+
+      // --- 4) Hero image enters AFTER loader ---
+      if (typeof gsap !== "undefined") {
+        gsap.to(".hero-image", {
+          right: "5%",
+          duration: 1.2,
+          ease: "power3.out"
+        });
+
+        // Reveal bottle (if present)
+        gsap.to(".bottle", {
+          opacity: 1,
+          duration: 0.5,
+          delay: 0.2
+        });
+      }
+    }, 800);
+  }, 3000); // ~3s total
+});
+</script>
+
+{% schema %}
+{
+  "name": "Loader Hero",
+  "settings": [],
+  "presets": [
+    { "name": "Loader Hero" }
+  ]
+}
+{% endschema %}
